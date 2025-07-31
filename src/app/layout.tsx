@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import type { Metadata, Viewport } from 'next';
 import AppLayout from './AppLayout';
 import React from 'react';
+import AuthProvider from '@/components/AuthProvider';
+
 
 export const metadata: Metadata = {
   title: 'Firebase Studio App',
@@ -36,9 +38,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </head>
       <body className="font-body antialiased">
-        <AppLayout>
-          {children}
-        </AppLayout>
+        <AuthProvider>
+          <AppLayout>
+            {children}
+          </AppLayout>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>
