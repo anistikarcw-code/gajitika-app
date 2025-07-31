@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { ChevronRight, Shield, Briefcase, Link as LinkIcon, Bell, User, LogOut, LayoutGrid } from 'lucide-react';
 import AppShell from './app-shell';
+import { usePotongan } from '@/hooks/use-potongan';
 
 const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children?: React.ReactNode }) => (
   <div className="flex items-center justify-between py-3">
@@ -17,6 +18,8 @@ const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType
 );
 
 export default function LainnyaShell() {
+  const { bpjsKesehatanEnabled, setBpjsKesehatanEnabled, bpjsKetenagakerjaanEnabled, setBpjsKetenagakerjaanEnabled } = usePotongan();
+
   return (
     <AppShell activeTab="Lainnya">
       <header className="bg-primary text-primary-foreground p-4 flex items-center gap-4 rounded-b-3xl">
@@ -33,10 +36,16 @@ export default function LainnyaShell() {
             <div className="px-6">
               <h3 className="text-sm font-semibold text-muted-foreground mb-2">Potongan Kerja</h3>
               <SettingsItem icon={Shield} label="BPJS Kesehatan">
-                <Switch defaultChecked />
+                <Switch 
+                  checked={bpjsKesehatanEnabled} 
+                  onCheckedChange={setBpjsKesehatanEnabled} 
+                />
               </SettingsItem>
               <SettingsItem icon={Shield} label="BPJS Ketenagakerjaan">
-                <Switch />
+                <Switch 
+                   checked={bpjsKetenagakerjaanEnabled} 
+                   onCheckedChange={setBpjsKetenagakerjaanEnabled}
+                />
               </SettingsItem>
             </div>
             

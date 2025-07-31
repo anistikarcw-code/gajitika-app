@@ -21,6 +21,7 @@ import { Slider } from '@/components/ui/slider';
 import React from 'react';
 import Link from 'next/link';
 import AppShell from './app-shell';
+import { usePotongan } from '@/hooks/use-potongan';
 
 const StatCard = ({
   icon: Icon,
@@ -67,7 +68,13 @@ const ServiceIcon = ({
 
 export default function FinancialAppShell() {
   const [sliderValue, setSliderValue] = React.useState(75);
-  const withdrawalAmount = (1700000 * sliderValue) / 100;
+  const { bpjsKesehatanEnabled } = usePotongan();
+  
+  const totalGaji = 1700000;
+  const potonganBpjs = 93536;
+  const gajiSetelahPotongan = bpjsKesehatanEnabled ? totalGaji - potonganBpjs : totalGaji;
+
+  const withdrawalAmount = (gajiSetelahPotongan * sliderValue) / 100;
 
   const getPeriod = () => {
     const today = new Date();
@@ -137,7 +144,7 @@ export default function FinancialAppShell() {
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>Rp50.000</span>
-              <span>Rp1.700.000</span>
+              <span>Rp{new Intl.NumberFormat('id-ID').format(gajiSetelahPotongan)}</span>
             </div>
 
             <Button className="w-full mt-4 font-bold" size="lg">
