@@ -1,0 +1,12 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/kerjaku/page": "app/kerjaku/page.js",
+  "/lainnya/page": "app/lainnya/page.js",
+  "/history/page": "app/history/page.js",
+  "/laporan-pengeluaran/page": "app/laporan-pengeluaran/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/profil/page": "app/profil/page.js",
+  "/register/page": "app/register/page.js"
+}
