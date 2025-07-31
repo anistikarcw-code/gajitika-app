@@ -77,7 +77,6 @@ export default function FinancialAppShell() {
                 </Button>
             </div>
             <div className="flex justify-between items-center gap-2 mt-4">
-                 <StatCard icon={Wallet} title="Limit Gaji Tersedia" value="Rp1.700.000" />
                  <StatCard icon={Star} title="Poin" value="100.000" />
                  <StatCard icon={CreditCard} title="Kartu" value="Rp95" />
             </div>
@@ -87,7 +86,7 @@ export default function FinancialAppShell() {
              <Card>
                 <CardContent className="p-4">
                     <div className="flex justify-between items-center text-sm mb-4">
-                        <span className="font-medium">Tarik Dari:</span>
+                        <span className="font-medium">perkiraan gajihmu</span>
                         <Button variant="outline" size="sm" className="h-auto px-2 py-1 text-xs">
                              <Wallet className="w-3 h-3 mr-1" />
                              Limit Gaji Tersedia
