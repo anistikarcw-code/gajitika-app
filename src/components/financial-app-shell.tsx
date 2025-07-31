@@ -10,6 +10,7 @@ import {
   Ticket,
   MoreHorizontal,
   Receipt,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,6 +19,23 @@ import React from 'react';
 import AppShell from './app-shell';
 import { usePotongan } from '@/hooks/use-potongan';
 import { useCheckIn } from '@/hooks/use-check-in';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from './ui/input';
 
 const StatCard = ({
   icon: Icon,
@@ -44,12 +62,19 @@ const ServiceIcon = ({
   icon: Icon,
   label,
   badge,
+  onClick,
 }: {
   icon: React.ElementType;
   label: string;
   badge?: string;
+  onClick?: () => void;
 }) => (
-  <div className="flex flex-col items-center gap-2 relative">
+  <div
+    className="flex flex-col items-center gap-2 relative"
+    onClick={onClick}
+    role={onClick ? 'button' : undefined}
+    tabIndex={onClick ? 0 : undefined}
+  >
     {badge && (
       <div className="absolute -top-2 -right-2 text-[10px] bg-red-500 text-white px-1 py-0.5 rounded-md">
         {badge}
@@ -65,65 +90,97 @@ const ServiceIcon = ({
 export default function FinancialAppShell() {
   const [sliderValue, setSliderValue] = React.useState(75);
   const { bpjsKesehatanEnabled } = usePotongan();
-  const { checkIns } = useCheckIn();
+  const { checkIns, addCheckOut } = useCheckIn();
+  const [isEditTimeOpen, setIsEditTimeOpen] = React.useState(false);
+  const [selectedDate, setSelectedDate] = React.useState('');
+  const [newTime, setNewTime] = React.useState('');
 
   const getPeriodDates = () => {
     const today = new Date();
     const currentDay = today.getDate();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
-    
+
     let startDate, endDate;
 
     if (currentDay < 26) {
-        startDate = new Date(currentYear, currentMonth - 1, 26);
-        endDate = new Date(currentYear, currentMonth, 25);
+      startDate = new Date(currentYear, currentMonth - 1, 26);
+      endDate = new Date(currentYear, currentMonth, 25);
     } else {
-        startDate = new Date(currentYear, currentMonth, 26);
-        endDate = new Date(currentYear, currentMonth + 1, 25);
+      startDate = new Date(currentYear, currentMonth, 26);
+      endDate = new Date(currentYear, currentMonth + 1, 25);
     }
     return { startDate, endDate };
-  }
+  };
 
   const { startDate, endDate } = getPeriodDates();
 
-  const workdaysInPeriod = Object.keys(checkIns).filter(dateString => {
+  const workdaysInPeriod = Object.keys(checkIns).filter((dateString) => {
     const checkinDate = new Date(dateString);
     return checkinDate >= startDate && checkinDate <= endDate;
   });
-  
+
   const dailySalary = 111355;
   const overtimeRatePerHour = 18000;
-  
+
   const totalGaji = workdaysInPeriod.reduce((total, dateString) => {
     const entry = checkIns[dateString];
     if (!entry.checkOutTime) return total; // Don't count incomplete days
 
     const checkInTime = new Date(entry.checkInTime);
     const checkOutTime = new Date(entry.checkOutTime);
-    const workHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+    const workHours =
+      (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
 
     let daySalary = dailySalary; // Assume it's a normal workday for base salary
     if (workHours > 9) {
-        const overtimeHours = workHours - 9;
-        daySalary += overtimeHours * overtimeRatePerHour;
+      const overtimeHours = workHours - 9;
+      daySalary += overtimeHours * overtimeRatePerHour;
     }
     return total + daySalary;
-
   }, 0);
 
   const potonganBpjs = 93536;
-  const gajiSetelahPotongan = bpjsKesehatanEnabled ? totalGaji - potonganBpjs : totalGaji;
+  const gajiSetelahPotongan = bpjsKesehatanEnabled
+    ? totalGaji - potonganBpjs
+    : totalGaji;
 
   const withdrawalAmount = (gajiSetelahPotongan * sliderValue) / 100;
 
   const getPeriodString = () => {
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'short',
+    };
     const startDateString = startDate.toLocaleDateString('id-ID', options);
     const endDateString = endDate.toLocaleDateString('id-ID', options);
     return `${startDateString} - ${endDateString}`;
-  }
+  };
 
+  const datesWithoutCheckout = Object.keys(checkIns)
+    .filter((date) => !checkIns[date].checkOutTime)
+    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+  const handleEditTimeSubmit = () => {
+    if (!selectedDate || !newTime) return;
+
+    const [hours, minutes] = newTime.split(':').map(Number);
+    const checkoutDateTime = new Date(selectedDate);
+    checkoutDateTime.setHours(hours, minutes, 0, 0);
+
+    addCheckOut(selectedDate, checkoutDateTime.toISOString());
+
+    setIsEditTimeOpen(false);
+    setSelectedDate('');
+    setNewTime('');
+  };
+
+  const openEditTimeDialog = () => {
+    if (datesWithoutCheckout.length > 0) {
+      setSelectedDate(datesWithoutCheckout[0]);
+    }
+    setIsEditTimeOpen(true);
+  };
 
   return (
     <AppShell activeTab="Beranda">
@@ -167,20 +224,26 @@ export default function FinancialAppShell() {
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>Rp0</span>
-              <span>Rp{new Intl.NumberFormat('id-ID').format(gajiSetelahPotongan > 0 ? gajiSetelahPotongan : 0)}</span>
+              <span>
+                Rp
+                {new Intl.NumberFormat('id-ID').format(
+                  gajiSetelahPotongan > 0 ? gajiSetelahPotongan : 0
+                )}
+              </span>
             </div>
 
             <Button className="w-full mt-4 font-bold" size="lg">
               Total Pendapatan
             </Button>
             <p className="text-center text-xs text-gray-400 mt-2">
-              Periode Gaji: {getPeriodString()} ({workdaysInPeriod.length} hari kerja)
+              Periode Gaji: {getPeriodString()} ({workdaysInPeriod.length} hari
+              kerja)
             </p>
           </CardContent>
         </Card>
 
         <div className="grid grid-cols-4 gap-4">
-          <ServiceIcon icon={Wallet} label="E-Money" />
+          <ServiceIcon icon={Clock} label="Edit Waktu" onClick={openEditTimeDialog} />
           <ServiceIcon icon={Phone} label="Pulsa" badge="Hemat 13%" />
           <ServiceIcon icon={Ticket} label="Voucher" badge="Hemat 13%" />
           <ServiceIcon icon={MoreHorizontal} label="Lainnya" />
@@ -193,6 +256,49 @@ export default function FinancialAppShell() {
           </div>
         </div>
       </main>
+
+      <Dialog open={isEditTimeOpen} onOpenChange={setIsEditTimeOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Waktu Check-out</DialogTitle>
+            <DialogDescription>
+              Pilih tanggal dan masukkan waktu check-out yang terlupa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Select onValueChange={setSelectedDate} value={selectedDate}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih tanggal" />
+              </SelectTrigger>
+              <SelectContent>
+                {datesWithoutCheckout.map((date) => (
+                  <SelectItem key={date} value={date}>
+                    {new Date(date).toLocaleDateString('id-ID', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              type="time"
+              value={newTime}
+              onChange={(e) => setNewTime(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Batal
+              </Button>
+            </DialogClose>
+            <Button type="submit" onClick={handleEditTimeSubmit}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
