@@ -137,9 +137,9 @@ export default function FinancialAppShell() {
 
         <footer className="bg-card shadow-[0_-2px_10px_rgba(0,0,0,0.05)] rounded-t-3xl p-2">
             <div className="flex justify-around items-start">
-                <NavItem icon={Home} label="Beranda" />
-                <NavItem icon={ArrowRightLeft} label="Transaksi" />
-                <NavItem icon={Receipt} label="Pembayaran" isActive />
+                <NavItem icon={Home} label="Beranda" isActive />
+                <NavItem icon={ArrowRightLeft} label="History Kerja" />
+                <NavItem icon={Receipt} label="Kerjaku" />
                 <NavItem icon={LayoutGrid} label="Lainnya" />
             </div>
         </footer>
