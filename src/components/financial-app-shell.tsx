@@ -70,7 +70,7 @@ export default function FinancialAppShell() {
     <div className="bg-background text-foreground min-h-screen flex flex-col">
         <header className="bg-primary text-primary-foreground p-4 rounded-b-3xl">
             <div className="flex justify-between items-center">
-                <h1 className="text-xl font-bold">GajiGesa</h1>
+                <h1 className="text-xl font-bold">GajiTika</h1>
                 <Button variant="ghost" size="sm" className="text-xs h-auto p-1 text-primary-foreground hover:bg-white/20">
                     <HelpCircle className="w-4 h-4 mr-1" />
                     Bantuan
@@ -113,7 +113,7 @@ export default function FinancialAppShell() {
                         <span>Rp1.700.000</span>
                     </div>
 
-                    <Button className="w-full mt-4 font-bold" size="lg">Tarik Gaji Sekarang</Button>
+                    <Button className="w-full mt-4 font-bold" size="lg">Total Pendapatan</Button>
                     <p className="text-center text-xs text-gray-400 mt-2">
                         Transaksi bisa dilakukan pada 25 Apr - 24 Mei 2022
                     </p>
