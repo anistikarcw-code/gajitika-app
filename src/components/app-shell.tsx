@@ -1,5 +1,5 @@
 'use client';
-import { Home, ArrowRightLeft, Receipt, LayoutGrid, CheckCircle } from 'lucide-react';
+import { Home, History, Receipt, LayoutGrid, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -47,7 +47,7 @@ export default function AppShell({
 
   const navItemsLeft = [
     { icon: Home, label: 'Beranda', href: '/' },
-    { icon: ArrowRightLeft, label: 'History Kerja', href: '/history' },
+    { icon: History, label: 'History Kerja', href: '/history' },
   ];
   const navItemsRight = [
     { icon: Receipt, label: 'Kerjaku', href: '/kerjaku' },
