@@ -7,11 +7,17 @@ type PotonganState = {
   setBpjsKesehatanEnabled: (enabled: boolean) => void;
   bpjsKetenagakerjaanEnabled: boolean;
   setBpjsKetenagakerjaanEnabled: (enabled: boolean) => void;
+  resetPotongan: () => void;
 };
 
+const initialState = {
+    bpjsKesehatanEnabled: true,
+    bpjsKetenagakerjaanEnabled: false,
+}
+
 export const usePotongan = create<PotonganState>((set) => ({
-  bpjsKesehatanEnabled: true,
+  ...initialState,
   setBpjsKesehatanEnabled: (enabled) => set({ bpjsKesehatanEnabled: enabled }),
-  bpjsKetenagakerjaanEnabled: false,
   setBpjsKetenagakerjaanEnabled: (enabled) => set({ bpjsKetenagakerjaanEnabled: enabled }),
+  resetPotongan: () => set(initialState),
 }));
