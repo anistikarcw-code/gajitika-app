@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'Firebase Studio App',
@@ -25,7 +26,14 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className="font-body antialiased">{children}</body>
+      <body className="font-body antialiased">
+        <main className="flex justify-center items-start min-h-screen bg-gray-100 p-0 md:p-4">
+          <div className="w-full max-w-sm mx-auto bg-white shadow-lg rounded-3xl overflow-hidden md:mt-8">
+            {children}
+          </div>
+        </main>
+        <Toaster />
+      </body>
     </html>
   );
 }
