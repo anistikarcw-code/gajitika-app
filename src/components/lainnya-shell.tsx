@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button } from './ui/button';
+import { buttonVariants } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -129,7 +129,7 @@ export default function LainnyaShell() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleResetData} className={Button({variant: "destructive"})} >Reset</AlertDialogAction>
+                        <AlertDialogAction onClick={handleResetData} className={buttonVariants({variant: "destructive"})} >Reset</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
