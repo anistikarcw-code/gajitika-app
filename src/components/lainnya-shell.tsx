@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { ChevronRight, Shield, Briefcase, Link as LinkIcon, Bell, User, LogOut, LayoutGrid, RefreshCw } from 'lucide-react';
+import { ChevronRight, Shield, Briefcase, Link as LinkIcon, Bell, User, LogOut, LayoutGrid, RefreshCw, FileText } from 'lucide-react';
 import AppShell from './app-shell';
 import { usePotongan } from '@/hooks/use-potongan';
 import { useCheckIn } from '@/hooks/use-check-in';
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { buttonVariants } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 
 const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children?: React.ReactNode }) => (
@@ -32,13 +33,27 @@ const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType
   </div>
 );
 
-const ClickableSettingsItem = ({ icon: Icon, label, onClick, className }: { icon: React.ElementType; label: string; onClick?: () => void, className?: string }) => (
-    <button onClick={onClick} className={`w-full ${className}`}>
-        <SettingsItem icon={Icon} label={label}>
+const ClickableSettingsItem = ({ icon: Icon, label, onClick, href, className }: { icon: React.ElementType; label: string; onClick?: () => void, href?: string, className?: string }) => {
+    const content = (
+         <SettingsItem icon={Icon} label={label}>
             <ChevronRight className="w-5 h-5" />
         </SettingsItem>
-    </button>
-);
+    );
+
+    if (href) {
+        return (
+            <Link href={href} className={`w-full ${className}`}>
+                {content}
+            </Link>
+        )
+    }
+
+    return (
+        <button onClick={onClick} className={`w-full ${className}`}>
+           {content}
+        </button>
+    )
+};
 
 
 export default function LainnyaShell() {
@@ -93,6 +108,19 @@ export default function LainnyaShell() {
               </SettingsItem>
             </div>
           </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>Laporan</CardTitle>
+            </CardHeader>
+             <CardContent className="p-0">
+                <div className="px-6">
+                    <ClickableSettingsItem icon={FileText} label="Laporan Pemasukan Kerja" href="/history" />
+                    <Separator />
+                    <ClickableSettingsItem icon={FileText} label="Laporan Pengeluaran" href="/laporan-pengeluaran" />
+                </div>
+             </CardContent>
         </Card>
 
         <Card>
