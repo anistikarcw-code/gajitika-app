@@ -1,4 +1,3 @@
-
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
@@ -11,30 +10,34 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const pathname = usePathname();
 
   useEffect(() => {
-    // Kita perlu memastikan kode ini hanya berjalan di klien
     if (typeof window === 'undefined') return;
 
     const publicPaths = ['/login', '/register', '/_offline'];
     const pathIsPublic = publicPaths.includes(pathname);
     
-    // Jika pengguna tidak login dan mencoba mengakses halaman yang dilindungi
     if (!isLoggedIn && !pathIsPublic) {
       router.push('/login');
     } 
-    // Jika pengguna sudah login dan mencoba mengakses halaman publik (seperti login/register)
     else if (isLoggedIn && pathIsPublic) {
       router.push('/');
     }
 
   }, [isLoggedIn, pathname, router]);
+  
+  // Mencegah render konten yang salah saat pengalihan akan terjadi.
+  // Ini adalah pemeriksaan kunci untuk mencegah perulangan render di server.
+  if (typeof window !== 'undefined') {
+    const publicPaths = ['/login', '/register', '/_offline'];
+    const pathIsPublic = publicPaths.includes(pathname);
 
-  // Untuk mencegah render anak-anak sebelum pengalihan sempat terjadi,
-  // kita bisa menambahkan pengecekan di sini. Jika pengalihan akan segera terjadi, kita tidak merender apa pun.
-  const isRedirecting = (!isLoggedIn && !['/login', '/register', '/_offline'].includes(pathname)) || (isLoggedIn && ['/login', '/register'].includes(pathname));
-
-  if (isRedirecting) {
-    return null; // atau spinner pemuatan
+    if (!isLoggedIn && !pathIsPublic) {
+      return null; // atau spinner pemuatan
+    }
+    if (isLoggedIn && pathIsPublic) {
+      return null; // atau spinner pemuatan
+    }
   }
+
 
   return <>{children}</>;
 };
