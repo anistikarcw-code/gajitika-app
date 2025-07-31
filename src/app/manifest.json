@@ -1,0 +1,25 @@
+{
+    "theme_color": "#E91E63",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "id": "/",
+    "start_url": "/",
+    "name": "GajiTika",
+    "short_name": "GajiTika",
+    "description": "Aplikasi untuk melacak dan menghitung gaji Anda.",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
