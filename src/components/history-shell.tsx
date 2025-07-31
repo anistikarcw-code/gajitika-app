@@ -4,8 +4,10 @@ import AppShell from './app-shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCheckIn } from '@/hooks/use-check-in';
-import { History, Download, Printer, ChevronRight } from 'lucide-react';
+import { History, Download, Printer } from 'lucide-react';
 import { Separator } from './ui/separator';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function HistoryShell() {
   const { checkIns } = useCheckIn();
@@ -68,7 +70,17 @@ export default function HistoryShell() {
   };
 
   const handleDownload = () => {
-    alert('Fungsi unduh PDF akan segera tersedia!');
+    const reportElement = document.getElementById('history-report');
+    if (reportElement) {
+      html2canvas(reportElement, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Laporan_GajiTika_${getPeriodString()}.pdf`);
+      });
+    }
   };
 
   return (
@@ -79,63 +91,66 @@ export default function HistoryShell() {
       </header>
 
       <main className="flex-grow p-4 space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <span>Periode Saat Ini</span>
-              <span className="text-sm font-normal text-muted-foreground">{getPeriodString()}</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Pendapatan</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalGaji)}</p>
-              </div>
-              <div className="text-right">
-                 <p className="text-sm text-muted-foreground">Total Hari Kerja</p>
-                 <p className="text-2xl font-bold">{workdaysInPeriod.length}</p>
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4">
-                <Button variant="outline" className="w-full" onClick={handlePrint}>
-                    <Printer className="mr-2 h-4 w-4" /> Cetak
-                </Button>
-                <Button className="w-full" onClick={handleDownload}>
-                    <Download className="mr-2 h-4 w-4" /> Unduh
-                </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
+        <div id="history-report">
+            <Card>
             <CardHeader>
-                <CardTitle>Rincian Kehadiran</CardTitle>
+                <CardTitle className="flex justify-between items-center">
+                <span>Periode Saat Ini</span>
+                <span className="text-sm font-normal text-muted-foreground">{getPeriodString()}</span>
+                </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {workdaysInPeriod.length > 0 ? (
-                        workdaysInPeriod.map(checkin => (
-                            <React.Fragment key={checkin}>
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <p className="font-medium">{formatDate(checkin)}</p>
-                                        <p className="text-sm text-green-600">Hadir</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold text-primary">{formatCurrency(dailySalary)}</p>
-                                        <p className="text-xs text-muted-foreground">Gaji Harian</p>
-                                    </div>
-                                </div>
-                                <Separator />
-                            </React.Fragment>
-                        ))
-                    ) : (
-                        <p className="text-center text-muted-foreground">Belum ada data check-in pada periode ini.</p>
-                    )}
+                <div className="flex justify-between items-center mb-4">
+                <div>
+                    <p className="text-sm text-muted-foreground">Total Pendapatan</p>
+                    <p className="text-2xl font-bold">{formatCurrency(totalGaji)}</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Total Hari Kerja</p>
+                    <p className="text-2xl font-bold">{workdaysInPeriod.length}</p>
+                </div>
                 </div>
             </CardContent>
-        </Card>
+            </Card>
+
+            <Card className="mt-4">
+                <CardHeader>
+                    <CardTitle>Rincian Kehadiran</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {workdaysInPeriod.length > 0 ? (
+                            workdaysInPeriod.map((checkin, index) => (
+                                <React.Fragment key={checkin}>
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <p className="font-medium">{formatDate(checkin)}</p>
+                                            <p className="text-sm text-green-600">Hadir</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-semibold text-primary">{formatCurrency(dailySalary)}</p>
+                                            <p className="text-xs text-muted-foreground">Gaji Harian</p>
+                                        </div>
+                                    </div>
+                                    {index < workdaysInPeriod.length - 1 && <Separator />}
+                                </React.Fragment>
+                            ))
+                        ) : (
+                            <p className="text-center text-muted-foreground">Belum ada data check-in pada periode ini.</p>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <div className="flex gap-2 mt-4">
+            <Button variant="outline" className="w-full" onClick={handlePrint}>
+                <Printer className="mr-2 h-4 w-4" /> Cetak
+            </Button>
+            <Button className="w-full" onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" /> Unduh
+            </Button>
+        </div>
       </main>
     </AppShell>
   );
