@@ -6,13 +6,13 @@ import { Separator } from '@/components/ui/separator';
 import { ChevronRight, Shield, Briefcase, Link as LinkIcon, Bell, User, LogOut, LayoutGrid } from 'lucide-react';
 import AppShell from './app-shell';
 
-const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType, label: string, children: React.ReactNode }) => (
+const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children?: React.ReactNode }) => (
   <div className="flex items-center justify-between py-3">
     <div className="flex items-center gap-4">
       <Icon className="w-5 h-5 text-muted-foreground" />
       <span className="font-medium">{label}</span>
     </div>
-    {children}
+    <div>{children}</div>
   </div>
 );
 
@@ -60,7 +60,7 @@ export default function LainnyaShell() {
                <Separator />
                 <SettingsItem icon={User} label="Profil Saya">
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
-               </Setti                                ngsItem>
+               </SettingsItem>
                <Separator />
                 <SettingsItem icon={Bell} label="Notifikasi">
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
