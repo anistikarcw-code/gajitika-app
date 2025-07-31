@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   Receipt,
   Clock,
+  ClipboardList,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,6 +37,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from './ui/input';
+import { useNotes } from '@/hooks/use-notes';
+import { useToast } from '@/hooks/use-toast';
+import { Textarea } from './ui/textarea';
 
 const StatCard = ({
   icon: Icon,
@@ -94,6 +98,10 @@ export default function FinancialAppShell() {
   const [isEditTimeOpen, setIsEditTimeOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState('');
   const [newTime, setNewTime] = React.useState('');
+  const [isNoteDialogOpen, setIsNoteDialogOpen] = React.useState(false);
+  const [newNote, setNewNote] = React.useState('');
+  const { addNote } = useNotes();
+  const { toast } = useToast();
 
   const getPeriodDates = () => {
     const today = new Date();
@@ -182,6 +190,21 @@ export default function FinancialAppShell() {
     setIsEditTimeOpen(true);
   };
 
+  const handleNoteSubmit = () => {
+    if (!newNote.trim()) return;
+    addNote({
+      id: Date.now().toString(),
+      text: newNote,
+      createdAt: new Date().toISOString(),
+    });
+    toast({
+      title: "Catatan Ditambahkan",
+      description: newNote,
+    });
+    setNewNote('');
+    setIsNoteDialogOpen(false);
+  }
+
   return (
     <AppShell activeTab="Beranda">
       <header className="bg-primary text-primary-foreground p-4 rounded-b-3xl">
@@ -244,7 +267,7 @@ export default function FinancialAppShell() {
 
         <div className="grid grid-cols-4 gap-4">
           <ServiceIcon icon={Clock} label="Edit Waktu" onClick={openEditTimeDialog} />
-          <ServiceIcon icon={Phone} label="Pulsa" badge="Hemat 13%" />
+          <ServiceIcon icon={ClipboardList} label="Catatan" onClick={() => setIsNoteDialogOpen(true)}/>
           <ServiceIcon icon={Ticket} label="Voucher" badge="Hemat 13%" />
           <ServiceIcon icon={MoreHorizontal} label="Lainnya" />
         </div>
@@ -296,6 +319,33 @@ export default function FinancialAppShell() {
               </Button>
             </DialogClose>
             <Button type="submit" onClick={handleEditTimeSubmit}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isNoteDialogOpen} onOpenChange={setIsNoteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Catatan Baru</DialogTitle>
+            <DialogDescription>
+              Tulis agenda atau pengingat Anda. Catatan ini akan muncul sebagai notifikasi.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Textarea 
+              placeholder="Ketik catatan Anda di sini..."
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Batal
+              </Button>
+            </DialogClose>
+            <Button type="submit" onClick={handleNoteSubmit}>Simpan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
