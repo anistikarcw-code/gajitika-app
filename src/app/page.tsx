@@ -7,16 +7,11 @@ import { useEffect } from 'react';
 
 export default function Home() {
   const { isLoggedIn } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/login');
-    }
-  }, [isLoggedIn, router]);
-
+  
   if (!isLoggedIn) {
-    return null; // or a loading spinner
+    // AuthProvider in AppLayout will handle the redirect.
+    // Return null or a loading spinner to prevent rendering the page content briefly before redirecting.
+    return null;
   }
   
   return <FinancialAppShell />;
