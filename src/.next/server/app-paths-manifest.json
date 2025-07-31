@@ -1,9 +1,9 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/history/page": "app/history/page.js",
   "/kerjaku/page": "app/kerjaku/page.js",
   "/lainnya/page": "app/lainnya/page.js",
-  "/history/page": "app/history/page.js",
   "/laporan-pengeluaran/page": "app/laporan-pengeluaran/page.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
