@@ -12,6 +12,7 @@ import {
   Receipt,
   Clock,
   ClipboardList,
+  ShoppingBasket,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -40,6 +41,8 @@ import { Input } from './ui/input';
 import { useNotes } from '@/hooks/use-notes';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from './ui/textarea';
+import { useExpenses } from '@/hooks/use-expenses';
+import { Label } from './ui/label';
 
 const StatCard = ({
   icon: Icon,
@@ -102,6 +105,10 @@ export default function FinancialAppShell() {
   const [newNote, setNewNote] = React.useState('');
   const { addNote } = useNotes();
   const { toast } = useToast();
+  const [isExpenseDialogOpen, setIsExpenseDialogOpen] = React.useState(false);
+  const [expenseAmount, setExpenseAmount] = React.useState('');
+  const [expenseDescription, setExpenseDescription] = React.useState('');
+  const { addExpense } = useExpenses();
 
   const getPeriodDates = () => {
     const today = new Date();
@@ -205,6 +212,31 @@ export default function FinancialAppShell() {
     setIsNoteDialogOpen(false);
   }
 
+  const handleExpenseSubmit = () => {
+    const amount = parseFloat(expenseAmount);
+    if (isNaN(amount) || amount <= 0 || !expenseDescription.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Input Tidak Valid",
+        description: "Mohon masukkan jumlah dan deskripsi pengeluaran yang valid.",
+      });
+      return;
+    }
+    addExpense({
+      id: Date.now().toString(),
+      amount,
+      description: expenseDescription,
+      date: new Date().toISOString(),
+    });
+    toast({
+      title: "Pengeluaran Ditambahkan",
+      description: `${expenseDescription}: Rp${new Intl.NumberFormat('id-ID').format(amount)}`,
+    });
+    setExpenseAmount('');
+    setExpenseDescription('');
+    setIsExpenseDialogOpen(false);
+  }
+
   return (
     <AppShell activeTab="Beranda">
       <header className="bg-primary text-primary-foreground p-4 rounded-b-3xl">
@@ -268,7 +300,7 @@ export default function FinancialAppShell() {
         <div className="grid grid-cols-4 gap-4">
           <ServiceIcon icon={Clock} label="Edit Waktu" onClick={openEditTimeDialog} />
           <ServiceIcon icon={ClipboardList} label="Catatan" onClick={() => setIsNoteDialogOpen(true)}/>
-          <ServiceIcon icon={Ticket} label="Voucher" badge="Hemat 13%" />
+          <ServiceIcon icon={ShoppingBasket} label="Pengeluaranku" onClick={() => setIsExpenseDialogOpen(true)} />
           <ServiceIcon icon={MoreHorizontal} label="Lainnya" />
         </div>
       </main>
@@ -339,6 +371,52 @@ export default function FinancialAppShell() {
               </Button>
             </DialogClose>
             <Button type="submit" onClick={handleNoteSubmit}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isExpenseDialogOpen} onOpenChange={setIsExpenseDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Pengeluaran</DialogTitle>
+            <DialogDescription>
+              Catat pengeluaran baru Anda di sini.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="expense-amount" className="text-right">
+                    Jumlah
+                </Label>
+                <Input
+                    id="expense-amount"
+                    type="number"
+                    value={expenseAmount}
+                    onChange={(e) => setExpenseAmount(e.target.value)}
+                    placeholder="e.g. 50000"
+                    className="col-span-3"
+                />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="expense-description" className="text-right">
+                    Deskripsi
+                </Label>
+                <Input
+                    id="expense-description"
+                    value={expenseDescription}
+                    onChange={(e) => setExpenseDescription(e.target.value)}
+                    placeholder="e.g. Makan siang"
+                    className="col-span-3"
+                />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Batal
+              </Button>
+            </DialogClose>
+            <Button type="submit" onClick={handleExpenseSubmit}>Simpan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
