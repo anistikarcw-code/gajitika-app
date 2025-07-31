@@ -271,13 +271,6 @@ export default function FinancialAppShell() {
           <ServiceIcon icon={Ticket} label="Voucher" badge="Hemat 13%" />
           <ServiceIcon icon={MoreHorizontal} label="Lainnya" />
         </div>
-
-        <div className="bg-primary/20 text-primary-dark font-bold p-3 rounded-lg flex items-center justify-center gap-2">
-          <span>Kamu Hemat Rp50.000</span>
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <Receipt className="w-5 h-5 text-white" />
-          </div>
-        </div>
       </main>
 
       <Dialog open={isEditTimeOpen} onOpenChange={setIsEditTimeOpen}>
