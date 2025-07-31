@@ -1,6 +1,7 @@
 "use client"
 
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 type PotonganState = {
   bpjsKesehatanEnabled: boolean;
@@ -15,9 +16,17 @@ const initialState = {
     bpjsKetenagakerjaanEnabled: false,
 }
 
-export const usePotongan = create<PotonganState>((set) => ({
-  ...initialState,
-  setBpjsKesehatanEnabled: (enabled) => set({ bpjsKesehatanEnabled: enabled }),
-  setBpjsKetenagakerjaanEnabled: (enabled) => set({ bpjsKetenagakerjaanEnabled: enabled }),
-  resetPotongan: () => set(initialState),
-}));
+export const usePotongan = create<PotonganState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+      setBpjsKesehatanEnabled: (enabled) => set({ bpjsKesehatanEnabled: enabled }),
+      setBpjsKetenagakerjaanEnabled: (enabled) => set({ bpjsKetenagakerjaanEnabled: enabled }),
+      resetPotongan: () => set(initialState),
+    }),
+    {
+      name: 'potongan-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
