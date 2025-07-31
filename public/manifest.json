@@ -4,9 +4,10 @@
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
-  "name": "GajiTika App",
+  "id": "/",
+  "name": "GajiTika",
   "short_name": "GajiTika",
-  "description": "Aplikasi untuk mengelola gaji dan keuangan.",
+  "description": "Aplikasi untuk mengelola gaji dan absensi karyawan.",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
