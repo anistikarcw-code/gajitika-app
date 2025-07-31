@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Wallet,
@@ -43,6 +44,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Textarea } from './ui/textarea';
 import { useExpenses } from '@/hooks/use-expenses';
 import { Label } from './ui/label';
+import { useAuth } from '@/hooks/use-auth';
 
 const StatCard = ({
   icon: Icon,
@@ -109,6 +111,7 @@ export default function FinancialAppShell() {
   const [expenseAmount, setExpenseAmount] = React.useState('');
   const [expenseDescription, setExpenseDescription] = React.useState('');
   const { addExpense } = useExpenses();
+  const { user } = useAuth();
 
   const getPeriodDates = () => {
     const today = new Date();
@@ -241,7 +244,10 @@ export default function FinancialAppShell() {
     <AppShell activeTab="Beranda">
       <header className="bg-primary text-primary-foreground p-4 rounded-b-3xl">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">GajiTika</h1>
+          <div>
+            <p className="text-xs">Selamat Datang,</p>
+            <h1 className="text-xl font-bold">{user?.name || 'Pengguna'}</h1>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -423,5 +429,3 @@ export default function FinancialAppShell() {
     </AppShell>
   );
 }
-
-    

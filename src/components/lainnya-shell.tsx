@@ -1,3 +1,4 @@
+
 'use client';
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +22,8 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 
 
 const SettingsItem = ({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children?: React.ReactNode }) => (
@@ -42,14 +45,14 @@ const ClickableSettingsItem = ({ icon: Icon, label, onClick, href, className }: 
 
     if (href) {
         return (
-            <Link href={href} className={`w-full ${className}`}>
+            <Link href={href} className={`block w-full ${className}`}>
                 {content}
             </Link>
         )
     }
 
     return (
-        <button onClick={onClick} className={`w-full ${className}`}>
+        <button onClick={onClick} className={`w-full text-left ${className}`}>
            {content}
         </button>
     )
@@ -60,6 +63,8 @@ export default function LainnyaShell() {
   const { bpjsKesehatanEnabled, setBpjsKesehatanEnabled, bpjsKetenagakerjaanEnabled, setBpjsKetenagakerjaanEnabled, resetPotongan } = usePotongan();
   const { resetCheckIns } = useCheckIn();
   const { toast } = useToast();
+  const { logout } = useAuth();
+  const router = useRouter();
 
   const handleResetData = () => {
     resetCheckIns();
@@ -69,6 +74,15 @@ export default function LainnyaShell() {
         description: "Semua data aplikasi telah berhasil direset.",
     });
   };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+        title: "Keluar Berhasil",
+        description: "Anda telah berhasil keluar.",
+    });
+    router.push('/login');
+  }
 
   return (
     <AppShell activeTab="Lainnya">
@@ -130,9 +144,7 @@ export default function LainnyaShell() {
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                </SettingsItem>
                <Separator />
-                <SettingsItem icon={User} label="Profil Saya">
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-               </SettingsItem>
+                <ClickableSettingsItem icon={User} label="Profil Saya" href="/profil" />
                <Separator />
                 <SettingsItem icon={Bell} label="Notifikasi">
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -163,7 +175,7 @@ export default function LainnyaShell() {
                 </AlertDialog>
             </div>
              <div className="px-6 text-red-500">
-               <ClickableSettingsItem icon={LogOut} label="Keluar" className="text-red-500"/>
+               <ClickableSettingsItem icon={LogOut} label="Keluar" className="text-red-500" onClick={handleLogout}/>
             </div>
           </CardContent>
         </Card>
