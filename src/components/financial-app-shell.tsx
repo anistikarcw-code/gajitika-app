@@ -69,6 +69,32 @@ export default function FinancialAppShell() {
   const [sliderValue, setSliderValue] = React.useState(75);
   const withdrawalAmount = (1700000 * sliderValue) / 100;
 
+  const getPeriod = () => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    let startMonth, endMonth, startYear, endYear;
+
+    if (currentDay < 26) {
+        // Period from previous month to current month
+        startMonth = new Date(currentYear, currentMonth - 1, 26);
+        endMonth = new Date(currentYear, currentMonth, 25);
+    } else {
+        // Period from current month to next month
+        startMonth = new Date(currentYear, currentMonth, 26);
+        endMonth = new Date(currentYear, currentMonth + 1, 25);
+    }
+
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    const startDate = startMonth.toLocaleDateString('id-ID', options);
+    const endDate = endMonth.toLocaleDateString('id-ID', options);
+
+    return `${startDate} - ${endDate}`;
+  }
+
+
   return (
     <AppShell activeTab="Beranda">
       <header className="bg-primary text-primary-foreground p-4 rounded-b-3xl">
@@ -118,7 +144,7 @@ export default function FinancialAppShell() {
               Total Pendapatan
             </Button>
             <p className="text-center text-xs text-gray-400 mt-2">
-              Transaksi bisa dilakukan pada 25 Apr - 24 Mei 2022
+              Periode Gaji: {getPeriod()}
             </p>
           </CardContent>
         </Card>
