@@ -87,13 +87,30 @@ export default function FinancialAppShell() {
 
   const { startDate, endDate } = getPeriodDates();
 
-  const workdaysInPeriod = checkIns.filter(dateString => {
+  const workdaysInPeriod = Object.keys(checkIns).filter(dateString => {
     const checkinDate = new Date(dateString);
     return checkinDate >= startDate && checkinDate <= endDate;
-  }).length;
+  });
   
   const dailySalary = 111355;
-  const totalGaji = workdaysInPeriod * dailySalary;
+  const overtimeRatePerHour = 18000;
+  
+  const totalGaji = workdaysInPeriod.reduce((total, dateString) => {
+    const entry = checkIns[dateString];
+    if (!entry.checkOutTime) return total; // Don't count incomplete days
+
+    const checkInTime = new Date(entry.checkInTime);
+    const checkOutTime = new Date(entry.checkOutTime);
+    const workHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+
+    let daySalary = dailySalary; // Assume it's a normal workday for base salary
+    if (workHours > 9) {
+        const overtimeHours = workHours - 9;
+        daySalary += overtimeHours * overtimeRatePerHour;
+    }
+    return total + daySalary;
+
+  }, 0);
 
   const potonganBpjs = 93536;
   const gajiSetelahPotongan = bpjsKesehatanEnabled ? totalGaji - potonganBpjs : totalGaji;
@@ -157,7 +174,7 @@ export default function FinancialAppShell() {
               Total Pendapatan
             </Button>
             <p className="text-center text-xs text-gray-400 mt-2">
-              Periode Gaji: {getPeriodString()} ({workdaysInPeriod} hari kerja)
+              Periode Gaji: {getPeriodString()} ({workdaysInPeriod.length} hari kerja)
             </p>
           </CardContent>
         </Card>

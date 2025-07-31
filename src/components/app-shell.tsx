@@ -1,5 +1,5 @@
 'use client';
-import { Home, History, Receipt, LayoutGrid, CheckCircle } from 'lucide-react';
+import { Home, History, Receipt, LayoutGrid, CheckCircle, LogOut as CheckOutIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -41,9 +41,13 @@ export default function AppShell({
   activeTab: 'Beranda' | 'History Kerja' | 'Kerjaku' | 'Lainnya';
 }) {
   const { toast } = useToast();
-  const { addCheckIn, checkIns } = useCheckIn();
-  const today = new Date().toISOString().split('T')[0];
-  const isCheckedInToday = checkIns.includes(today);
+  const { checkIns, addCheckIn, addCheckOut } = useCheckIn();
+  const todayString = new Date().toISOString().split('T')[0];
+  
+  const todaysCheckIn = checkIns[todayString];
+  const isCheckedIn = !!todaysCheckIn;
+  const isCheckedOut = isCheckedIn && !!todaysCheckIn.checkOutTime;
+
 
   const navItemsLeft = [
     { icon: Home, label: 'Beranda', href: '/' },
@@ -54,21 +58,37 @@ export default function AppShell({
     { icon: LayoutGrid, label: 'Lainnya', href: '/lainnya' },
   ];
 
-  const handleCheckIn = () => {
-    if (!isCheckedInToday) {
-      addCheckIn(today);
+  const handleCheckInOut = () => {
+    const now = new Date().toISOString();
+    
+    if (!isCheckedIn) {
+      // Check-in logic
+      addCheckIn(todayString, now);
       toast({
         title: 'Check-in Berhasil',
-        description: 'Anda telah berhasil check-in untuk hari ini.',
+        description: `Anda telah berhasil check-in pada: ${new Date().toLocaleTimeString()}`,
       });
-    } else {
+    } else if (!isCheckedOut) {
+      // Check-out logic
+      addCheckOut(todayString, now);
       toast({
-        title: 'Sudah Check-in',
-        description: 'Anda sudah melakukan check-in hari ini.',
-        variant: 'destructive',
+        title: 'Check-out Berhasil',
+        description: `Anda telah berhasil check-out pada: ${new Date().toLocaleTimeString()}`,
       });
     }
   };
+  
+  const getButtonContent = () => {
+      if (!isCheckedIn) {
+          return { icon: CheckCircle, label: 'Cek-in', disabled: false, buttonClass: 'bg-primary' };
+      }
+      if (!isCheckedOut) {
+          return { icon: CheckOutIcon, label: 'Cek-out', disabled: false, buttonClass: 'bg-orange-500' };
+      }
+      return { icon: CheckCircle, label: 'Selesai', disabled: true, buttonClass: 'bg-green-500' };
+  }
+
+  const { icon: ButtonIcon, label: buttonLabel, disabled: isButtonDisabled, buttonClass } = getButtonContent();
 
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col">
@@ -87,13 +107,13 @@ export default function AppShell({
           <div className="flex flex-col items-center gap-1.5 -mt-8">
             <Button
               size="icon"
-              className="w-16 h-16 rounded-full bg-primary shadow-lg text-white"
-              onClick={handleCheckIn}
-              disabled={isCheckedInToday}
+              className={`w-16 h-16 rounded-full shadow-lg text-white transition-colors ${buttonClass}`}
+              onClick={handleCheckInOut}
+              disabled={isButtonDisabled}
             >
-              <CheckCircle className="w-8 h-8" />
+              <ButtonIcon className="w-8 h-8" />
             </Button>
-            <span className="text-xs font-medium mt-1">Cek-in</span>
+            <span className="text-xs font-medium mt-1">{buttonLabel}</span>
           </div>
           {navItemsRight.map((item) => (
             <NavItem
