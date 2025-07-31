@@ -22,7 +22,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isLoggedIn, pathname, router]);
 
-  // While redirecting, it's better to show nothing to avoid flashing content
   const isRedirecting = (!isLoggedIn && !['/login', '/register', '/_offline'].includes(pathname)) || (isLoggedIn && (pathname === '/login' || pathname === '/register'));
   if (isRedirecting) {
     return null;
@@ -38,7 +37,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const publicPaths = ['/login', '/register'];
+  const publicPaths = ['/login', '/register', '/_offline'];
   const noShellLayout = publicPaths.includes(pathname);
 
   return (
