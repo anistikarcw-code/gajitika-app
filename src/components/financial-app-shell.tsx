@@ -1,0 +1,148 @@
+'use client';
+import {
+  Wallet,
+  Star,
+  CreditCard,
+  HelpCircle,
+  Pencil,
+  ChevronDown,
+  ChevronRight,
+  Home,
+  ArrowRightLeft,
+  Receipt,
+  LayoutGrid,
+  Phone,
+  Ticket,
+  MoreHorizontal
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import React from 'react';
+
+const StatCard = ({
+  icon: Icon,
+  title,
+  value,
+}: {
+  icon: React.ElementType;
+  title: string;
+  value: string;
+}) => (
+  <div className="bg-primary/10 rounded-lg p-3 flex-1">
+    <div className="flex items-center gap-2 text-primary text-xs">
+      <Icon className="w-4 h-4" />
+      <span>{title}</span>
+    </div>
+    <div className="font-bold text-sm text-primary-dark mt-1 flex items-center justify-between">
+      <span>{value}</span>
+      <ChevronRight className="w-4 h-4 text-primary/50" />
+    </div>
+  </div>
+);
+
+const ServiceIcon = ({ icon: Icon, label, badge }: { icon: React.ElementType; label: string, badge?:string }) => (
+    <div className="flex flex-col items-center gap-2 relative">
+         {badge && <div className="absolute -top-2 -right-2 text-[10px] bg-red-500 text-white px-1 py-0.5 rounded-md">{badge}</div>}
+        <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
+            <Icon className="w-6 h-6 text-primary" />
+        </div>
+        <span className="text-xs text-center text-foreground/80">{label}</span>
+    </div>
+);
+
+
+const NavItem = ({ icon: Icon, label, isActive }: { icon: React.ElementType; label: string; isActive?: boolean; }) => (
+    <div className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors ${isActive ? 'text-primary' : 'text-gray-400'}`}>
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${isActive ? 'bg-primary' : 'bg-transparent'}`}>
+            <Icon className={`w-6 h-6 ${isActive ? 'text-white' : ''}`} />
+        </div>
+        <span className="text-xs font-medium">{label}</span>
+    </div>
+);
+
+
+export default function FinancialAppShell() {
+  const [sliderValue, setSliderValue] = React.useState(75);
+  const withdrawalAmount = (1700000 * sliderValue) / 100;
+  
+  return (
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
+        <header className="bg-primary text-primary-foreground p-4 rounded-b-3xl">
+            <div className="flex justify-between items-center">
+                <h1 className="text-xl font-bold">GajiGesa</h1>
+                <Button variant="ghost" size="sm" className="text-xs h-auto p-1 text-primary-foreground hover:bg-white/20">
+                    <HelpCircle className="w-4 h-4 mr-1" />
+                    Bantuan
+                </Button>
+            </div>
+            <div className="flex justify-between items-center gap-2 mt-4">
+                 <StatCard icon={Wallet} title="Limit Gaji Tersedia" value="Rp1.700.000" />
+                 <StatCard icon={Star} title="Poin" value="100.000" />
+                 <StatCard icon={CreditCard} title="Kartu" value="Rp95" />
+            </div>
+        </header>
+
+        <main className="flex-grow p-4 space-y-4">
+             <Card>
+                <CardContent className="p-4">
+                    <div className="flex justify-between items-center text-sm mb-4">
+                        <span className="font-medium">Tarik Dari:</span>
+                        <Button variant="outline" size="sm" className="h-auto px-2 py-1 text-xs">
+                             <Wallet className="w-3 h-3 mr-1" />
+                             Limit Gaji Tersedia
+                             <ChevronDown className="w-3 h-3 ml-1" />
+                        </Button>
+                    </div>
+
+                    <div className="flex justify-between items-baseline mb-2">
+                        <span className="text-3xl font-bold">
+                            Rp{new Intl.NumberFormat('id-ID').format(withdrawalAmount)}
+                        </span>
+                        <Pencil className="w-4 h-4 text-gray-400" />
+                    </div>
+
+                     <Slider
+                        value={[sliderValue]}
+                        onValueChange={(value) => setSliderValue(value[0])}
+                        max={100}
+                        step={1}
+                     />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Rp50.000</span>
+                        <span>Rp1.700.000</span>
+                    </div>
+
+                    <Button className="w-full mt-4 font-bold" size="lg">Tarik Gaji Sekarang</Button>
+                    <p className="text-center text-xs text-gray-400 mt-2">
+                        Transaksi bisa dilakukan pada 25 Apr - 24 Mei 2022
+                    </p>
+                </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-4 gap-4">
+                <ServiceIcon icon={Wallet} label="E-Money" />
+                <ServiceIcon icon={Phone} label="Pulsa" badge="Hemat 13%" />
+                <ServiceIcon icon={Ticket} label="Voucher" badge="Hemat 13%" />
+                <ServiceIcon icon={MoreHorizontal} label="Lainnya" />
+            </div>
+
+            <div className="bg-primary/20 text-primary-dark font-bold p-3 rounded-lg flex items-center justify-center gap-2">
+                 <span>Kamu Hemat Rp50.000</span>
+                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <Receipt className="w-5 h-5 text-white"/>
+                 </div>
+            </div>
+        </main>
+
+        <footer className="bg-card shadow-[0_-2px_10px_rgba(0,0,0,0.05)] rounded-t-3xl p-2">
+            <div className="flex justify-around items-start">
+                <NavItem icon={Home} label="Beranda" />
+                <NavItem icon={ArrowRightLeft} label="Transaksi" />
+                <NavItem icon={Receipt} label="Pembayaran" isActive />
+                <NavItem icon={LayoutGrid} label="Lainnya" />
+            </div>
+        </footer>
+    </div>
+  );
+}
