@@ -5,23 +5,19 @@ import {
   CreditCard,
   HelpCircle,
   Pencil,
-  ChevronDown,
   ChevronRight,
-  Home,
-  ArrowRightLeft,
-  Receipt,
-  LayoutGrid,
   Phone,
   Ticket,
   MoreHorizontal,
+  Receipt,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import React from 'react';
-import Link from 'next/link';
 import AppShell from './app-shell';
 import { usePotongan } from '@/hooks/use-potongan';
+import { useCheckIn } from '@/hooks/use-check-in';
 
 const StatCard = ({
   icon: Icon,
@@ -69,36 +65,46 @@ const ServiceIcon = ({
 export default function FinancialAppShell() {
   const [sliderValue, setSliderValue] = React.useState(75);
   const { bpjsKesehatanEnabled } = usePotongan();
-  
-  const totalGaji = 1700000;
-  const potonganBpjs = 93536;
-  const gajiSetelahPotongan = bpjsKesehatanEnabled ? totalGaji - potonganBpjs : totalGaji;
+  const { checkIns } = useCheckIn();
 
-  const withdrawalAmount = (gajiSetelahPotongan * sliderValue) / 100;
-
-  const getPeriod = () => {
+  const getPeriodDates = () => {
     const today = new Date();
     const currentDay = today.getDate();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     
-    let startMonth, endMonth, startYear, endYear;
+    let startDate, endDate;
 
     if (currentDay < 26) {
-        // Period from previous month to current month
-        startMonth = new Date(currentYear, currentMonth - 1, 26);
-        endMonth = new Date(currentYear, currentMonth, 25);
+        startDate = new Date(currentYear, currentMonth - 1, 26);
+        endDate = new Date(currentYear, currentMonth, 25);
     } else {
-        // Period from current month to next month
-        startMonth = new Date(currentYear, currentMonth, 26);
-        endMonth = new Date(currentYear, currentMonth + 1, 25);
+        startDate = new Date(currentYear, currentMonth, 26);
+        endDate = new Date(currentYear, currentMonth + 1, 25);
     }
+    return { startDate, endDate };
+  }
 
+  const { startDate, endDate } = getPeriodDates();
+
+  const workdaysInPeriod = checkIns.filter(dateString => {
+    const checkinDate = new Date(dateString);
+    return checkinDate >= startDate && checkinDate <= endDate;
+  }).length;
+  
+  const dailySalary = 111355;
+  const totalGaji = workdaysInPeriod * dailySalary;
+
+  const potonganBpjs = 93536;
+  const gajiSetelahPotongan = bpjsKesehatanEnabled ? totalGaji - potonganBpjs : totalGaji;
+
+  const withdrawalAmount = (gajiSetelahPotongan * sliderValue) / 100;
+
+  const getPeriodString = () => {
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
-    const startDate = startMonth.toLocaleDateString('id-ID', options);
-    const endDate = endMonth.toLocaleDateString('id-ID', options);
-
-    return `${startDate} - ${endDate}`;
+    const startDateString = startDate.toLocaleDateString('id-ID', options);
+    const endDateString = endDate.toLocaleDateString('id-ID', options);
+    return `${startDateString} - ${endDateString}`;
   }
 
 
@@ -143,15 +149,15 @@ export default function FinancialAppShell() {
               step={1}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>Rp50.000</span>
-              <span>Rp{new Intl.NumberFormat('id-ID').format(gajiSetelahPotongan)}</span>
+              <span>Rp0</span>
+              <span>Rp{new Intl.NumberFormat('id-ID').format(gajiSetelahPotongan > 0 ? gajiSetelahPotongan : 0)}</span>
             </div>
 
             <Button className="w-full mt-4 font-bold" size="lg">
               Total Pendapatan
             </Button>
             <p className="text-center text-xs text-gray-400 mt-2">
-              Periode Gaji: {getPeriod()}
+              Periode Gaji: {getPeriodString()} ({workdaysInPeriod} hari kerja)
             </p>
           </CardContent>
         </Card>
