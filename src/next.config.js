@@ -2,7 +2,7 @@
  * @deprecated next.config.js is deprecated. Please use next.config.mjs instead.
  */
 // @ts-check
-const {withPWA} = require('next-pwa');
+const withPWA = require('next-pwa');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV === 'development';
