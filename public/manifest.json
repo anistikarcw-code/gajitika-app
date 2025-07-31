@@ -7,7 +7,7 @@
   "id": "/",
   "name": "GajiTika",
   "short_name": "GajiTika",
-  "description": "Aplikasi untuk mengelola gaji dan absensi karyawan.",
+  "description": "A financial tracking app for your salary.",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
